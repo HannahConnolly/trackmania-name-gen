@@ -1,3 +1,5 @@
+import { JSX } from "react";
+
 // Real-time display
 type Props = { styledName: string }
 
