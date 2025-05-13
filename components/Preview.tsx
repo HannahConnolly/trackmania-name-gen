@@ -1,16 +1,21 @@
 import { JSX } from "react";
 
 // Displays the styled name visually
-type Props = { styledName: string }
+type Props = { 
+  styledName: string
+  nameSyntax: object
+}
 
-export default function Preview({ styledName }: Props) {
+export default function Preview({ styledName, nameSyntax }: Props) {
   const parseStyledName = (input: string) => {
     const regex = /\$(\w{3})(.)/g; // Matches $<color><letter>
     const elements: JSX.Element[] = [];
     let match;
 
-    while ((match = regex.exec(input)) !== null) {
-      const [_, color, letter] = match;
+    for(let i = 0; i < input.length; i++) {
+      let letter = input[i];
+      let color = nameSyntax.color[0].code 
+      // const [_, color, letter] = match;
       elements.push(
         <span key={elements.length} style={{ color: `#${color}` }}>
           {letter}

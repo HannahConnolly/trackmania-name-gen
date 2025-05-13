@@ -19,7 +19,7 @@ type Props = {
           color: [
               {
                   code: "FFF",
-                  indices: []
+                  indices: [] as number[]
               }
           ]
       }
@@ -36,8 +36,11 @@ type Props = {
       }
     
       const shortHex = hex6to3(color)
-      const formatted = [...raw].map(char => `$${shortHex}${char}`).join("")
-      setStyledName(formatted)
+      nameSyntax.color[0].code = shortHex
+      nameSyntax.color[0].indices = [0, raw.length - 1] // append to beginning of word by default
+      // append to beginning of word by default
+      console.log(nameSyntax)
+      setName(raw)
     }
 
     return (
