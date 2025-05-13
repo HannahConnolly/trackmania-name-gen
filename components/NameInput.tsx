@@ -2,14 +2,27 @@
 type Props = {
     name: string
     setName: (val: string) => void
-    setStyledName: (val: string) => void
+    setNameSyntax: (val: object) => void
     color: string
   }
   
-  export default function NameInput({ name, setName, setStyledName, color }: Props) {
+  export default function NameInput({ name, setName, setNameSyntax, color }: Props) {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      
       const raw = e.target.value
+
       setName(raw)
+      const nameSyntax = {
+          bold: [],
+          italic: [],
+          wide: [],
+          color: [
+              {
+                  code: "FFF",
+                  indices: []
+              }
+          ]
+      }
   
       function hex6to3(hex: string): string {
         hex = hex.replace("#", "")
@@ -22,7 +35,6 @@ type Props = {
         return `${r}${g}${b}`
       }
     
-      setName(raw)
       const shortHex = hex6to3(color)
       const formatted = [...raw].map(char => `$${shortHex}${char}`).join("")
       setStyledName(formatted)
