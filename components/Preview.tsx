@@ -1,36 +1,31 @@
-import { JSX } from "react";
+import { parseCode } from "@/lib/tmFormat"
 
 // Displays the styled name visually
-type Props = { 
-  styledName: string
-  nameSyntax: object
-}
+type Props = { styledName: string }
 
-export default function Preview({ styledName, nameSyntax }: Props) {
-  const parseStyledName = (input: string) => {
-    const regex = /\$(\w{3})(.)/g; // Matches $<color><letter>
-    const elements: JSX.Element[] = [];
-    let match;
-
-    for(let i = 0; i < input.length; i++) {
-      let letter = input[i];
-      let color = nameSyntax.color[0].code 
-      // const [_, color, letter] = match;
-      elements.push(
-        <span key={elements.length} style={{ color: `#${color}` }}>
-          {letter}
-        </span>
-      );
-    }
-
-    return elements;
-  };
-
+export default function Preview({ styledName }: Props) {
   return (
     <div>
       <p className="text-sm text-gray-400 mb-1">Preview:</p>
-      <div className="bg-gray-900 p-4 rounded border border-gray-700">
-        {styledName ? parseStyledName(styledName) : "<empty>"}
+      <div className="bg-gray-900 p-4 rounded border border-gray-700 text-2xl whitespace-pre-wrap break-words min-h-16">
+        {styledName
+          ? parseCode(styledName).map((seg, i) => (
+              <span
+                key={i}
+                style={{
+                  color: seg.color ? `#${seg.color}` : undefined,
+                  fontWeight: seg.bold ? 700 : undefined,
+                  fontStyle: seg.italic ? "italic" : undefined,
+                  textTransform: seg.uppercase ? "uppercase" : undefined,
+                  textShadow: seg.shadow ? "2px 2px 0 rgba(0, 0, 0, 0.9)" : undefined,
+                  letterSpacing: seg.wide ? "0.25em" : seg.narrow ? "-0.05em" : undefined,
+                  fontStretch: seg.wide ? "expanded" : seg.narrow ? "condensed" : undefined,
+                }}
+              >
+                {seg.text}
+              </span>
+            ))
+          : <span className="text-gray-600 text-base">&lt;empty&gt;</span>}
       </div>
     </div>
   )
