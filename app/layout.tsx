@@ -1,6 +1,8 @@
+import type { Metadata } from 'next'
 import './globals.css'
 
-export const metadata = {
+export const metadata: Metadata = {
+  metadataBase: new URL('https://hannahconnolly.github.io'),
   title: 'Trackmania Name Colors Generator',
   description: 'Generate colorful, styled Trackmania names easily!',
 }

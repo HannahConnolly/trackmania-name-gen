@@ -63,22 +63,54 @@ export function gradientCodes(stops: string[], count: number): string[] {
   })
 }
 
-export function generateCode(name: string, colors: string[], styles: Styles): string {
-  const chars = Array.from(name)
-  if (chars.length === 0) return ""
+// A single character of the name with its own styling
+export type StyledChar = {
+  char: string
+  color: string | null // 6-digit hex override, null = follow the gradient
+  styles: Styles
+}
 
+// Carries styling over from the old name: characters before and after the edit keep theirs
+export function updateChars(prev: StyledChar[], name: string, defaults: Styles): StyledChar[] {
+  const next = Array.from(name)
+  const max = Math.min(prev.length, next.length)
+
+  let start = 0
+  while (start < max && prev[start].char === next[start]) start++
+  let end = 0
+  while (end < max - start && prev[prev.length - 1 - end].char === next[next.length - 1 - end]) end++
+
+  return [
+    ...prev.slice(0, start),
+    ...next.slice(start, next.length - end).map((char) => ({ char, color: null, styles: defaults })),
+    ...prev.slice(prev.length - end),
+  ]
+}
+
+export function generateCode(chars: StyledChar[], colors: string[]): string {
   // spaces don't take a gradient step
-  const codes = gradientCodes(colors, chars.filter((c) => c.trim()).length)
+  const codes = gradientCodes(colors, chars.filter((c) => c.char.trim()).length)
 
-  let out = STYLE_CODES.filter((s) => styles[s.key])
-    .map((s) => `$${s.code}`)
-    .join("")
+  let out = ""
+  let current = NO_STYLES
   let last = ""
   let visible = 0
 
-  for (const char of chars) {
+  for (const { char, color, styles } of chars) {
+    // turn styles off with a full reset, which works whether or not the game treats the codes as toggles
+    if (STYLE_CODES.some((s) => current[s.key] && !styles[s.key])) {
+      out += "$z"
+      current = NO_STYLES
+      last = ""
+    }
+    for (const s of STYLE_CODES) {
+      if (styles[s.key] && !current[s.key]) out += `$${s.code}`
+    }
+    current = styles
+
     if (char.trim()) {
-      const code = codes[visible++]
+      const code = color ? hex6to3(color) : codes[visible]
+      visible++
       if (code !== last) {
         out += `$${code}`
         last = code

@@ -4,26 +4,19 @@ import { STYLE_CODES, Styles } from "@/lib/tmFormat"
 
 type Props = {
   styles: Styles
-  onChange: (styles: Styles) => void
+  onToggle: (key: keyof Styles) => void
+  label?: string
 }
 
-export default function StyleToggles({ styles, onChange }: Props) {
-  const toggle = (key: keyof Styles) => {
-    const next = { ...styles, [key]: !styles[key] }
-    // wide and narrow cancel each other out in game
-    if (key === "wide" && next.wide) next.narrow = false
-    if (key === "narrow" && next.narrow) next.wide = false
-    onChange(next)
-  }
-
+export default function StyleToggles({ styles, onToggle, label = "Styles:" }: Props) {
   return (
     <div>
-      <p className="text-sm text-gray-400 mb-1">Styles:</p>
+      <p className="text-sm text-gray-400 mb-1">{label}</p>
       <div className="flex flex-wrap gap-2">
         {STYLE_CODES.map(({ key, code, label }) => (
           <button
             key={key}
-            onClick={() => toggle(key)}
+            onClick={() => onToggle(key)}
             aria-pressed={styles[key]}
             className={`px-3 py-1 rounded border text-sm cursor-pointer ${
               styles[key]
